@@ -54,22 +54,22 @@ level = [
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
-  [2, 2, 2, 2, 2],
+  [0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
-  [1, 1, 2, 2, 1],
-  [1, 1, 2, 2, 1],
-  [1, 1, 2, 1, 1],
-  [1, 1, 2, 1, 1],
-  [1, 1, 2, 1, 1],
-  [1, 1, 2, 1, 1],
-  [1, 1, 2, 1, 1],
-  [1, 2, 2, 1, 1],
-  [1, 2, 2, 1, 1],
+  [1, 1, 0, 0, 1],
+  [1, 1, 0, 0, 1],
+  [1, 1, 0, 1, 1],
+  [1, 1, 0, 1, 1],
+  [1, 1, 0, 1, 1],
+  [1, 1, 0, 1, 1],
+  [1, 1, 0, 1, 1],
+  [1, 0, 0, 1, 1],
+  [1, 0, 0, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
@@ -165,17 +165,51 @@ function drawPerspective() {
       if (z == 0) {
         l = "#fff";
       }
-      drawRect(
-        point_lut[0],
-        point_lut[1],
-        point_lu[0],
-        point_lu[1],
-        point_rut[0],
-        point_rut[1],
-        point_ru[0],
-        point_ru[1],
-        "#0f0"
-      );
+      if (
+        x == level[level.length - z - 1].length - 1 ||
+        level[level.length - z - 1][x + 1] == 0
+      ) {
+        drawRect(
+          point_rut[0],
+          point_rut[1],
+          point_rbt[0],
+          point_rbt[1],
+          point_ru[0],
+          point_ru[1],
+          point_rb[0],
+          point_rb[1],
+          "#333"
+        );
+      }
+
+      if (x == 0 || level[level.length - z - 1][x - 1] == 0) {
+        drawRect(
+          point_lut[0],
+          point_lut[1],
+          point_lbt[0],
+          point_lbt[1],
+          point_lu[0],
+          point_lu[1],
+          point_lb[0],
+          point_lb[1],
+          "#333"
+        );
+      }
+
+      if (z == 0 || level[level.length - z][x] == 0) {
+        drawRect(
+          point_lut[0],
+          point_lut[1],
+          point_lu[0],
+          point_lu[1],
+          point_rut[0],
+          point_rut[1],
+          point_ru[0],
+          point_ru[1],
+          "#0f0"
+        );
+      }
+
       drawRect(
         point_lu[0],
         point_lu[1],
