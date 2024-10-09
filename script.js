@@ -34,8 +34,15 @@ function drawTriangle(x1, y1, x2, y2, x3, y3, color) {
 }
 
 function drawRect(x1, y1, x2, y2, x3, y3, x4, y4, color) {
-  drawTriangle(x1, y1, x2, y2, x3, y3, color);
-  drawTriangle(x2, y2, x3, y3, x4, y4, color);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineTo(x4, y4);
+  ctx.lineTo(x3, y3);
+  ctx.closePath();
+
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
 function drawImg(img, x, y, width, height) {
