@@ -119,26 +119,80 @@ const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
 
 let blockWidth = 100;
 let blockLength = 40;
-let blockHeight = 20;
-let cameraZ = -80;
+let blockHeight = 40;
 let cameraX = 0;
-let distanceFactor = 800;
+let cameraY = 460;
+let cameraZ = -80;
 let renderDistance = 16;
+let renderDebug = false;
+let fov = 90;
 
 function project(position) {
   let mapCenterX = (level[0].length * blockWidth) / 2;
+  let mapCenterY = (level.length * blockWidth) / 2;
   let screenCenterX = canvas.width / 2;
   let screenCenterY = canvas.height / 2;
   let x = position[0];
   let y = position[1];
   let z = position[2];
-  x += cameraX;
-  let distance = z - cameraZ;
-  let distanceScaling = distance / distanceFactor;
-  y += screenCenterY * 2 - lerp(z - cameraZ, screenCenterY, distanceScaling);
-  x = lerp(x, mapCenterX, distanceScaling);
-  x += screenCenterX - mapCenterX;
-  return [x, y, z];
+  x -= mapCenterX - cameraX;
+  z -= cameraZ;
+  if (z < -0) {
+    z = -0;
+  }
+  x = (x * fov) / (z + fov);
+  z = ((y + cameraY) * fov) / (z + fov);
+  return [x + screenCenterX, screenCenterY + z];
+}
+
+function drawDebug(point_lu, point_ru, point_lb, point_rb, z) {
+  function drawLineSpecial(x1, y1, x2, y2, color, special) {
+    if (special) {
+      color = "#f0f";
+    }
+    drawLine(x1, y1, x2, y2, color, 1);
+  }
+  let special = z == 0;
+  drawLineSpecial(
+    point_lu[0],
+    point_lu[1],
+    point_lb[0],
+    point_lb[1],
+    "#000",
+    special
+  );
+  drawLineSpecial(
+    point_ru[0],
+    point_ru[1],
+    point_rb[0],
+    point_rb[1],
+    "#f00",
+    special
+  );
+  drawLineSpecial(
+    point_lu[0],
+    point_lu[1],
+    point_ru[0],
+    point_ru[1],
+    "#0f0",
+    special
+  );
+  drawLineSpecial(
+    point_lb[0],
+    point_lb[1],
+    point_rb[0],
+    point_rb[1],
+    "#00f",
+    special
+  );
+  //drawLine(point_lut[0], point_lut[1], point_lbt[0], point_lbt[1], l);
+  //drawLine(point_rut[0], point_rut[1], point_rbt[0], point_rbt[1], "#f00");
+  //drawLine(point_lut[0], point_lut[1], point_rut[0], point_rut[1], "#0f0");
+  //drawLine(point_lbt[0], point_lbt[1], point_rbt[0], point_rbt[1], "#00f");
+  //drawLine(point_lu[0], point_lu[1], point_lut[0], point_lut[1], l);
+  //drawLine(point_ru[0], point_ru[1], point_ru[0], point_rut[1], "#f00");
+  //drawLine(point_lb[0], point_lb[1], point_lb[0], point_lbt[1], "#0f0");
+  //drawLine(point_rb[0], point_rb[1], point_rb[0], point_rbt[1], "#00f");
 }
 
 function drawPerspective() {
@@ -164,8 +218,12 @@ function drawPerspective() {
       if (level[level.length - z - 1][x] == 0) {
         continue;
       }
-      if (z * blockLength - cameraZ > renderDistance * blockLength) {
+      if (renderDebug) {
+        drawDebug(point_lu, point_ru, point_lb, point_rb, z);
         continue;
+      }
+      if (z * blockLength - cameraZ > renderDistance * blockLength) {
+        //continue;
       }
 
       let l = "#000";
