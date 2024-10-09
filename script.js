@@ -22,18 +22,7 @@ function drawLine(x1, y1, x2, y2, color, width = 1) {
   ctx.stroke();
 }
 
-function drawTriangle(x1, y1, x2, y2, x3, y3, color) {
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.lineTo(x3, y3);
-  ctx.closePath();
-
-  ctx.fillStyle = color;
-  ctx.fill();
-}
-
-function drawRect(x1, y1, x2, y2, x3, y3, x4, y4, color) {
+function drawRect(x1, y1, x2, y2, x3, y3, x4, y4, fillColor, borderColor) {
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
@@ -41,8 +30,10 @@ function drawRect(x1, y1, x2, y2, x3, y3, x4, y4, color) {
   ctx.lineTo(x3, y3);
   ctx.closePath();
 
-  ctx.fillStyle = color;
+  ctx.fillStyle = fillColor;
   ctx.fill();
+  ctx.strokeStyle = borderColor;
+  ctx.stroke();
 }
 
 function drawImg(img, x, y, width, height) {
@@ -243,7 +234,8 @@ function drawPerspective() {
           point_ru[1],
           point_rb[0],
           point_rb[1],
-          "#333"
+          "#333",
+          "#fff"
         );
       }
 
@@ -257,7 +249,8 @@ function drawPerspective() {
           point_lu[1],
           point_lb[0],
           point_lb[1],
-          "#333"
+          "#333",
+          "#fff"
         );
       }
 
@@ -271,7 +264,8 @@ function drawPerspective() {
           point_rut[1],
           point_ru[0],
           point_ru[1],
-          "#0f0"
+          "#0f0",
+          "#fff"
         );
       }
 
@@ -284,7 +278,8 @@ function drawPerspective() {
         point_ru[1],
         point_rb[0],
         point_rb[1],
-        "#000"
+        "#000",
+        "#fff"
       );
     }
   }
