@@ -54,7 +54,6 @@ level = [
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
   [2, 2, 2, 2, 2],
   [1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1],
@@ -117,6 +116,7 @@ let blockHeight = 20;
 let cameraZ = -80;
 let cameraX = 0;
 let distanceFactor = 800;
+let renderDistance = 16;
 
 function project(position) {
   let mapCenterX = (level[0].length * blockWidth) / 2;
@@ -155,6 +155,9 @@ function drawPerspective() {
       ]);
 
       if (level[level.length - z - 1][x] == 0) {
+        continue;
+      }
+      if (z * blockLength - cameraZ > renderDistance * blockLength) {
         continue;
       }
 
