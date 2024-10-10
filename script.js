@@ -141,9 +141,9 @@ function project(position) {
   let x = position[0];
   let y = position[1];
   let z = position[2];
-  x = ((x - cameraX) * fov) / (z - cameraZ + fov);
-  z = ((y + cameraY) * fov) / (z - cameraZ + fov);
-  return [x, z];
+  let projectedX = ((x - cameraX) * fov) / (z - cameraZ + fov);
+  let projectedY = ((y + cameraY) * fov) / (z - cameraZ + fov);
+  return [projectedX, projectedY];
 }
 
 function drawDebug(vertices, z) {
