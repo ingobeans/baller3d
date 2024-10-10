@@ -45,20 +45,21 @@ function drawImg(img, x, y, width, height) {
 }
 
 level = [
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
-  [0, -2, -2, -2, 0],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
   [1, 1, 0, 0, 1],
   [1, 1, 0, 0, 1],
   [1, 1, 0, 1, 1],
@@ -89,11 +90,11 @@ level = [
   [0, 1, 1, 1, 0],
   [0, 1, 1, 1, 0],
   [0, 1, 1, 1, 0],
-  [1, -2, -2, -2, 1],
-  [1, -2, -2, -2, 1],
-  [1, -2, -2, -2, 1],
-  [1, -2, -2, -2, 1],
-  [1, -2, -2, -2, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1],
 ];
 
 const keys = {};
@@ -121,14 +122,12 @@ function update() {
   if (keys["d"]) {
     cameraX += 10;
   }
-  //drawLine(canvas.width / 2, 0, canvas.width / 2, canvas.height, "#ff00ff");
-  //drawLine(0, canvas.height / 2, canvas.width, canvas.height / 2, "#ff00ff");
   requestAnimationFrame(update);
 }
 
 let blockWidth = 100;
 let blockLength = 100;
-let blockHeight = 40;
+let blockHeight = 100;
 let cameraX = (level[0].length * blockWidth) / 2;
 let cameraY = 460;
 let cameraZ = -80;
@@ -136,11 +135,13 @@ let renderDistance = 16;
 let renderDebug = false;
 let fov = 700;
 let drawCalls = [];
+let skew = 0;
 
 function project(position) {
   let x = position[0];
   let y = position[1];
   let z = position[2];
+  y += (z - cameraZ) * skew;
   let projectedX = ((x - cameraX) * fov) / (z - cameraZ + fov);
   let projectedY = ((y + cameraY) * fov) / (z - cameraZ + fov);
   return [projectedX, projectedY];
@@ -256,7 +257,7 @@ function distanceTo(position) {
 
 function drawMesh(vertices, faces) {
   let screenCenterX = canvas.width / 2;
-  let screenCenterY = canvas.height / 2 + 50;
+  let screenCenterY = canvas.height / 2 - 150;
   function drawRectCall(
     distanceMax,
     distanceMin,
@@ -280,14 +281,16 @@ function drawMesh(vertices, faces) {
     });
   }
   for (face of faces) {
-    let color = "#000";
+    let color = "#1F259E";
     let v1 = vertices[face[0]];
     let v2 = vertices[face[1]];
     let v3 = vertices[face[2]];
     let v4 = vertices[face[3]];
 
     if (v1[1] == v2[1] && v1[1] == v3[1] && v1[1] == v4[1]) {
-      color = "#f0f";
+      color = "#2C35E0";
+    } else if (v1[0] == v2[0] && v1[0] == v3[0] && v1[0] == v4[0]) {
+      color = "#131760";
     }
 
     let p1 = project(v1);
