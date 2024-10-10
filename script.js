@@ -36,12 +36,8 @@ function drawRect(x1, y1, x2, y2, x3, y3, x4, y4, fillColor, borderColor) {
   ctx.stroke();
 }
 
-function drawImg(img, x, y, width, height) {
-  //const img = new Image();
-  //img.src = src;
-  img.onload = () => {
-    ctx.drawImage(img, x, y, width, height);
-  };
+function drawImg(img, x, y, width, height, sx, sy) {
+  ctx.drawImage(img, sx, sy, width, height, x, y, width, height);
 }
 
 level = [
@@ -97,6 +93,8 @@ level = [
   [1, 1, 1, 1, 1],
 ];
 
+const ball = new Image();
+ball.src = "ball.png";
 const keys = {};
 
 window.addEventListener("keydown", (event) => {
@@ -110,9 +108,7 @@ window.addEventListener("keyup", (event) => {
 const lerp = (x, y, a) => x * (1 - a) + y * a;
 const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
 
-function update() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawPerspective();
+function input() {
   if (keys["w"]) {
     ballZ += constantForwardSpeed;
   }
@@ -138,6 +134,39 @@ function update() {
       horizontalVelocity = lerp(horizontalVelocity, 0, horizontalAcceleration);
     }
   }
+}
+
+let ballFrame = 0;
+let ballCounter = 0;
+let ballAnimTime = 7;
+
+function drawBall() {
+  if (keys["w"]) {
+    ballCounter += 1;
+  }
+  if (ballCounter >= ballAnimTime) {
+    ballCounter = 0;
+    ballFrame += 1;
+    if (ballFrame >= 10) {
+      ballFrame = 0;
+    }
+  }
+  drawImg(
+    ball,
+    (canvas.width - 150) / 2,
+    canvas.height - 150 / 2 - 150,
+    150,
+    150,
+    ballFrame * 150,
+    0
+  );
+}
+
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  input();
+  drawPerspective();
+  drawBall();
   ballX += horizontalVelocity;
   requestAnimationFrame(update);
 }
