@@ -110,10 +110,10 @@ function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPerspective();
   if (keys["w"]) {
-    cameraZ += 1;
+    cameraZ += 10;
   }
   if (keys["s"]) {
-    cameraZ -= 1;
+    cameraZ -= 10;
   }
   if (keys["a"]) {
     cameraX -= 10;
@@ -126,32 +126,25 @@ function update() {
   requestAnimationFrame(update);
 }
 
-const lerp = (x, y, a) => x * (1 - a) + y * a;
-const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
-
 let blockWidth = 100;
-let blockLength = 40;
+let blockLength = 100;
 let blockHeight = 40;
 let cameraX = (level[0].length * blockWidth) / 2;
 let cameraY = 460;
 let cameraZ = -80;
 let renderDistance = 16;
 let renderDebug = false;
-let fov = 90;
+let fov = 700;
 let drawCalls = [];
 
 function project(position) {
-  let mapCenterX = (level[0].length * blockWidth) / 2;
-  let mapCenterY = (level.length * blockWidth) / 2;
   let screenCenterX = canvas.width / 2;
   let screenCenterY = canvas.height / 2;
   let x = position[0];
   let y = position[1];
   let z = position[2];
-  x -= cameraX;
-  z -= cameraZ;
-  x = (x * fov) / (z + fov);
-  z = ((y + cameraY) * fov) / (z + fov);
+  x = ((x - cameraX) * fov) / (z - cameraZ + fov);
+  z = ((y + cameraY) * fov) / (z - cameraZ + fov);
   return [x + screenCenterX, screenCenterY + z];
 }
 
@@ -207,7 +200,12 @@ function delay(ms) {
 }
 
 async function renderDrawCalls() {
-  drawCalls.sort((a, b) => b.distance - a.distance);
+  drawCalls.sort((a, b) => {
+    if (b.distanceMax === a.distanceMax) {
+      return b.distanceMin - a.distanceMin;
+    }
+    return b.distanceMax - a.distanceMax;
+  });
   for (call of drawCalls) {
     call["call"]();
   }
@@ -260,7 +258,8 @@ function distanceTo(position) {
 
 function drawMesh(vertices, faces) {
   function drawRectCall(
-    distance,
+    distanceMax,
+    distanceMin,
     x1,
     y1,
     x2,
@@ -273,7 +272,8 @@ function drawMesh(vertices, faces) {
     borderColor
   ) {
     drawCalls.push({
-      distance: distance,
+      distanceMax: distanceMax,
+      distanceMin: distanceMin,
       call: () => {
         drawRect(x1, y1, x2, y2, x3, y3, x4, y4, fillColor, borderColor);
       },
@@ -296,14 +296,16 @@ function drawMesh(vertices, faces) {
     let d3 = distanceTo(v3);
     let d4 = distanceTo(v4);
 
-    let distance = Math.max(d1, d2, d3, d4);
+    let distanceMax = Math.max(d1, d2, d3, d4);
+    let distanceMin = Math.min(d1, d2, d3, d4);
 
     if (v1[1] == v2[1] && v1[1] == v3[1] && v1[1] == v4[1]) {
       color = "#f0f";
     }
 
     drawRectCall(
-      distance,
+      distanceMax,
+      distanceMin,
       p1[0],
       p1[1],
       p2[0],
@@ -321,12 +323,12 @@ function drawMesh(vertices, faces) {
 function drawPerspective() {
   for (let z = level.length - 1; z >= 0; z--) {
     let pointZ = z * blockLength;
-    if (pointZ < cameraZ - fov) {
-      continue;
-    }
     for (let x = 0; x < level[level.length - z - 1].length; x++) {
       let pointX = x * blockWidth;
       let pointY = level[level.length - z - 1][x] * blockHeight;
+      if (pointZ < cameraZ) {
+        continue;
+      }
 
       if (level[level.length - z - 1][x] == 0) {
         continue;
