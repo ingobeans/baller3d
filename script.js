@@ -114,10 +114,10 @@ function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPerspective();
   if (keys["w"]) {
-    cameraZ += constantForwardSpeed;
+    ballZ += constantForwardSpeed;
   }
   if (keys["s"]) {
-    cameraZ -= constantForwardSpeed;
+    ballZ -= constantForwardSpeed;
   }
   if (keys["a"]) {
     horizontalVelocity = lerp(
@@ -138,16 +138,22 @@ function update() {
       horizontalVelocity = lerp(horizontalVelocity, 0, horizontalAcceleration);
     }
   }
-  cameraX += horizontalVelocity;
+  ballX += horizontalVelocity;
   requestAnimationFrame(update);
 }
 
 let blockWidth = 100;
 let blockLength = 100;
 let blockHeight = 100;
-let cameraX = (level[0].length * blockWidth) / 2;
-let cameraY = 460;
-let cameraZ = -80;
+
+let ballX = (level[0].length * blockWidth) / 2;
+let ballY = 0;
+let ballZ = 0;
+
+let cameraOffsetX = 0;
+let cameraOffsetY = 460;
+let cameraOffsetZ = -80;
+
 let renderDistance = 16;
 let renderDebug = false;
 let fov = 700;
@@ -163,9 +169,11 @@ function project(position) {
   let x = position[0];
   let y = position[1];
   let z = position[2];
-  y += (z - cameraZ) * skew;
-  let projectedX = ((x - cameraX) * fov) / (z - cameraZ + fov);
-  let projectedY = ((y + cameraY) * fov) / (z - cameraZ + fov);
+  y += (z - ballZ - cameraOffsetZ) * skew;
+  let projectedX =
+    ((x - ballX - cameraOffsetX) * fov) / (z - ballZ - cameraOffsetZ + fov);
+  let projectedY =
+    ((y + ballY + cameraOffsetY) * fov) / (z - ballZ - cameraOffsetZ + fov);
   return [projectedX, projectedY];
 }
 
@@ -270,9 +278,9 @@ function distanceTo(position) {
   let z = position[2];
 
   let distance = Math.sqrt(
-    Math.pow(x - cameraX, 2) +
-      Math.pow(-y * 2 - cameraY, 2) +
-      Math.pow(z - cameraZ, 2)
+    Math.pow(x - ballX - cameraOffsetX, 2) +
+      Math.pow(-y * 2 - ballY - cameraOffsetY, 2) +
+      Math.pow(z - ballZ - cameraOffsetZ, 2)
   );
   return distance;
 }
@@ -355,9 +363,9 @@ function drawPerspective() {
     for (let x = 0; x < level[level.length - z - 1].length; x++) {
       let pointX = x * blockWidth;
       let pointY = level[level.length - z - 1][x] * blockHeight;
-      if (pointZ < cameraZ) {
-        //continue;
-      }
+      //if (pointZ < cameraOffsetZ) {
+      //  //continue;
+      //}
 
       if (level[level.length - z - 1][x] == 0) {
         continue;
