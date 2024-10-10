@@ -107,21 +107,38 @@ window.addEventListener("keyup", (event) => {
   keys[event.key.toLowerCase()] = false;
 });
 
+const lerp = (x, y, a) => x * (1 - a) + y * a;
+const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
+
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPerspective();
   if (keys["w"]) {
-    cameraZ += 10;
+    cameraZ += constantForwardSpeed;
   }
   if (keys["s"]) {
-    cameraZ -= 10;
+    cameraZ -= constantForwardSpeed;
   }
   if (keys["a"]) {
-    cameraX -= 10;
+    horizontalVelocity = lerp(
+      horizontalVelocity,
+      -horizontalMaxSpeed,
+      horizontalAcceleration
+    );
   }
   if (keys["d"]) {
-    cameraX += 10;
+    horizontalVelocity = lerp(
+      horizontalVelocity,
+      horizontalMaxSpeed,
+      horizontalAcceleration
+    );
   }
+  if (!keys["a"] && !keys["d"]) {
+    if (horizontalVelocity != 0) {
+      horizontalVelocity = lerp(horizontalVelocity, 0, horizontalAcceleration);
+    }
+  }
+  cameraX += horizontalVelocity;
   requestAnimationFrame(update);
 }
 
@@ -136,6 +153,11 @@ let renderDebug = false;
 let fov = 700;
 let drawCalls = [];
 let skew = 0;
+
+let constantForwardSpeed = 10;
+let horizontalVelocity = 0;
+let horizontalAcceleration = 0.08;
+let horizontalMaxSpeed = 15;
 
 function project(position) {
   let x = position[0];
