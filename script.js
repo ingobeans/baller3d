@@ -138,14 +138,12 @@ let fov = 700;
 let drawCalls = [];
 
 function project(position) {
-  let screenCenterX = canvas.width / 2;
-  let screenCenterY = canvas.height / 2;
   let x = position[0];
   let y = position[1];
   let z = position[2];
   x = ((x - cameraX) * fov) / (z - cameraZ + fov);
   z = ((y + cameraY) * fov) / (z - cameraZ + fov);
-  return [x + screenCenterX, screenCenterY + z];
+  return [x, z];
 }
 
 function drawDebug(vertices, z) {
@@ -257,6 +255,8 @@ function distanceTo(position) {
 }
 
 function drawMesh(vertices, faces) {
+  let screenCenterX = canvas.width / 2;
+  let screenCenterY = canvas.height / 2 + 50;
   function drawRectCall(
     distanceMax,
     distanceMin,
@@ -286,10 +286,18 @@ function drawMesh(vertices, faces) {
     let v3 = vertices[face[2]];
     let v4 = vertices[face[3]];
 
+    if (v1[1] == v2[1] && v1[1] == v3[1] && v1[1] == v4[1]) {
+      color = "#f0f";
+    }
+
     let p1 = project(v1);
     let p2 = project(v2);
     let p3 = project(v3);
     let p4 = project(v4);
+
+    if (p1[1] < 0 || p2[1] < 0 || p3[1] < 0 || p4[1] < 0) {
+      continue;
+    }
 
     let d1 = distanceTo(v1);
     let d2 = distanceTo(v2);
@@ -299,21 +307,17 @@ function drawMesh(vertices, faces) {
     let distanceMax = Math.max(d1, d2, d3, d4);
     let distanceMin = Math.min(d1, d2, d3, d4);
 
-    if (v1[1] == v2[1] && v1[1] == v3[1] && v1[1] == v4[1]) {
-      color = "#f0f";
-    }
-
     drawRectCall(
       distanceMax,
       distanceMin,
-      p1[0],
-      p1[1],
-      p2[0],
-      p2[1],
-      p3[0],
-      p3[1],
-      p4[0],
-      p4[1],
+      p1[0] + screenCenterX,
+      p1[1] + screenCenterY,
+      p2[0] + screenCenterX,
+      p2[1] + screenCenterY,
+      p3[0] + screenCenterX,
+      p3[1] + screenCenterY,
+      p4[0] + screenCenterX,
+      p4[1] + screenCenterY,
       color,
       "#fff"
     );
@@ -327,7 +331,7 @@ function drawPerspective() {
       let pointX = x * blockWidth;
       let pointY = level[level.length - z - 1][x] * blockHeight;
       if (pointZ < cameraZ) {
-        continue;
+        //continue;
       }
 
       if (level[level.length - z - 1][x] == 0) {
