@@ -45,20 +45,20 @@ function drawImg(img, x, y, width, height) {
 }
 
 level = [
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
+  [0, -2, -2, -2, 0],
   [1, 1, 0, 0, 1],
   [1, 1, 0, 0, 1],
   [1, 1, 0, 1, 1],
@@ -89,11 +89,11 @@ level = [
   [0, 1, 1, 1, 0],
   [0, 1, 1, 1, 0],
   [0, 1, 1, 1, 0],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1],
+  [1, -2, -2, -2, 1],
+  [1, -2, -2, -2, 1],
+  [1, -2, -2, -2, 1],
+  [1, -2, -2, -2, 1],
+  [1, -2, -2, -2, 1],
 ];
 
 function update() {
@@ -128,9 +128,6 @@ function project(position) {
   let z = position[2];
   x -= mapCenterX - cameraX;
   z -= cameraZ;
-  if (z < -0) {
-    z = -0;
-  }
   x = (x * fov) / (z + fov);
   z = ((y + cameraY) * fov) / (z + fov);
   return [x + screenCenterX, screenCenterY + z];
@@ -191,18 +188,35 @@ function drawPerspective() {
     for (let x = 0; x < level[level.length - z - 1].length; x++) {
       let pointX = x * blockWidth;
       let pointZ = z * blockLength;
+      let pointY = level[level.length - z - 1][x] * blockHeight;
 
-      let point_lu = project([pointX, 0, pointZ]);
-      let point_ru = project([pointX + blockWidth, 0, pointZ]);
-      let point_lb = project([pointX, 0, pointZ + blockLength]);
-      let point_rb = project([pointX + blockWidth, 0, pointZ + blockLength]);
+      if (pointZ < cameraZ - fov) {
+        continue;
+      }
 
-      let point_lut = project([pointX, blockHeight, pointZ]);
-      let point_rut = project([pointX + blockWidth, blockHeight, pointZ]);
-      let point_lbt = project([pointX, blockHeight, pointZ + blockLength]);
+      let point_lu = project([pointX, pointY, pointZ]);
+      let point_ru = project([pointX + blockWidth, pointY, pointZ]);
+      let point_lb = project([pointX, pointY, pointZ + blockLength]);
+      let point_rb = project([
+        pointX + blockWidth,
+        pointY,
+        pointZ + blockLength,
+      ]);
+
+      let point_lut = project([pointX, pointY + blockHeight, pointZ]);
+      let point_rut = project([
+        pointX + blockWidth,
+        pointY + blockHeight,
+        pointZ,
+      ]);
+      let point_lbt = project([
+        pointX,
+        pointY + blockHeight,
+        pointZ + blockLength,
+      ]);
       let point_rbt = project([
         pointX + blockWidth,
-        blockHeight,
+        pointY + blockHeight,
         pointZ + blockLength,
       ]);
 
